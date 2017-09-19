@@ -785,10 +785,8 @@ class SGAN():
                     break
                 
                 #save image
-                if save_img:
-                    for idx in range(len(X_train)):
-                        self.save_imgs(epoch, save_img, logger, 2, 2)
-                        
+                if save_img:         
+                    self.save_imgs(epoch, save_img, logger, 2, 2)    
                     log("epoch:\t%d\t image is saved" % (epoch), logger)
                     
         if self.unsupervised == False:
@@ -807,33 +805,32 @@ class SGAN():
         noise = np.random.normal(0, 1, (r * c, 100))
         gen_imgs = [] 
         
-        for i in range(len(self.generators)):
-            generator = self.generators[i]
+        for idx in range(len(self.modality)):
+            generator = self.generators[idx]
             imgs = generator.predict(noise)
             gen_imgs.append(imgs)
             
+            log("epoch:\t%d\tgenerated %s image"%(epoch, self.modality[idx]), logger)
+            
             # Rescale images 0 - 1
-            gen_imgs = 0.5 * gen_imgs + 1
+            imgs = 0.5 * imgs + 1
 
             fig, axs = plt.subplots(r, c)
             cnt = 0
             for i in range(r):
                 for j in range(c):
-                    axs[i,j].imshow(gen_imgs[cnt, :,:,0])
+                    axs[i,j].imshow(imgs[cnt, :,:,0])
                     axs[i,j].axis('off')
                     cnt += 1
-            fig.savefig("%s/gan_img_%s_%d.png" % (name, self.modality[i], epoch))
+            fig.savefig("%s/img_%s_%d.png" % (name, self.modality[idx], epoch))
             plt.close()
         
         prob = self.discriminator.predict(gen_imgs)
         
         if logger:
-            print(prob)
-            
-            log("epoch:\t%d\tgenerated %s image"%(epoch, postfix), logger)
             #write down probablity of validation(real/fake) and classification in the log file
             for validity_class in prob:
-                log("prob:%s"%(str(validity_class)), logger)
+                log("prob of images:%s"%(str(validity_class)), logger)
         
 
     def save_model(self, model_name):
