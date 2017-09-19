@@ -4,7 +4,7 @@ This is a project of emotion recognition using KERAS based Semi-Generative Adver
 The implementation of SGAN is largely affected by:
 https://github.com/eriklindernoren/Keras-GAN
 
-Many ideas about feature structures for log-spectrogram are based on:
+A main idea about feature structures like 3D log-spectrogram are based on:
 
 Kim, Jaebok, Gwenn Englebienne, Khiet P Truong, and Vanessa Evers. “Deep Temporal Models using Identity Skip-Connections for Speech Emotion Recognition.” In: Proceedings of ACM Multimedia 2017
 
