@@ -807,6 +807,7 @@ class SGAN():
         noise = np.random.normal(0, 1, (r * c, 100))
         gen_imgs = generator.predict(noise)
         
+        '''
         prob = self.discriminator.predict(gen_imgs)
         
         if logger:
@@ -816,7 +817,7 @@ class SGAN():
             #write down probablity of validation(real/fake) and classification in the log file
             for validity_class in prob:
                 log("prob:%s"%(str(validity_class)), logger)
-            
+        '''    
             
         # Rescale images 0 - 1
         gen_imgs = 0.5 * gen_imgs + 1
@@ -864,65 +865,64 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--batch", dest= 'batch', type=int, help="batch size", default=128)
-    parser.add_argument("-e", "--epoch", dest= 'epoch', type=int, help="number of epoch", default=10)
+    parser.add_argument("-e", "--epoch", dest= 'epoch', type=int, help="maximum number of epoch", default=10)
     parser.add_argument("-p", "--patience", dest= 'patience', type=int, help="patience size for early stopping", default=5)
     
     parser.add_argument("-check_batch_interval", "--check_batch_interval", dest= 'check_batch_interval', type=int, help="batch interval for validation", default=10)
-    parser.add_argument("-save_img_interval", "--save_img_interval", dest= 'save_img_interval', type=int, help="epoch interval for saving image", default=1)
+    parser.add_argument("-save_img_interval", "--save_img_interval", dest= 'save_img_interval', type=int, help="epoch interval for saving generated images", default=1)
     
     #gan
-    parser.add_argument("-r_nrow", "--r_nrow", dest= 'r_nrow', type=str, help="reshaped_n_rows for multimodality, separated by ;", default = "28;48")
-    parser.add_argument("-r_ncol", "--r_ncol", dest= 'r_ncol', type=str, help="reshaped_n_cols for multimodality, separated by ;", default = "28;48")
+    parser.add_argument("-r_nrow", "--r_nrow", dest= 'r_nrow', type=str, help="reshaped # rows, for multimodal features, separated by ;", default = "28;48")
+    parser.add_argument("-r_ncol", "--r_ncol", dest= 'r_ncol', type=str, help="reshaped # columns, for multimodal features, separated by ;", default = "28;48")
 
     parser.add_argument("-task_weights", "--task_weights", dest= 'task_weights', type=str, help="weigths for task in GAN(validity, classification)", default="0.5,0.5")
-    parser.add_argument("-d_lr", "--D_learningrate", dest= 'd_lr', type=float, help="D_learningrate", default=0.0002)
-    parser.add_argument("-g_lr", "--G_learningrate", dest= 'g_lr', type=float, help="G_learningrate", default=0.0004)
+    parser.add_argument("-d_lr", "--D_learningrate", dest= 'd_lr', type=float, help="learning rate for a discriminator", default=0.0002)
+    parser.add_argument("-g_lr", "--G_learningrate", dest= 'g_lr', type=float, help="learning rate for generator(s)", default=0.0004)
     
     #convolution
-    parser.add_argument("-depth_G", "--depth_G", dest = 'depth_G', type = str, help = "depth of Generator", default = "4;4")
-    parser.add_argument("-depth_D", "--depth_D", dest = 'depth_D', type = str, help = "depth of Discriminator", default = "4;4")
+    parser.add_argument("-depth_G", "--depth_G", dest = 'depth_G', type = str, help = "depth of generator(s)", default = "4;4")
+    parser.add_argument("-depth_D", "--depth_D", dest = 'depth_D', type = str, help = "depth of discriminator(s)", default = "4;4")
     
-    parser.add_argument("-depth_a_v_D", "--depth_a_v_D", dest = 'depth_a_v_D', type = int, help = "depth of fully connected layer for Discriminator", default = 1)
+    parser.add_argument("-depth_a_v_D", "--depth_a_v_D", dest = 'depth_a_v_D', type = int, help = "depth of fully connected layer for a combined discriminator", default = 1)
 
-    parser.add_argument("-n_node", "--n_node", dest = 'n_node', type = int, help = "# nodes of Fully-connected network after CNNs", default = 512)
+    parser.add_argument("-n_node", "--n_node", dest = 'n_node', type = int, help = "# nodes of fully-connected layers after CNNs", default = 512)
     parser.add_argument("-drop","--dropout", dest='dropout', type=float, help="dropout")
 
-    parser.add_argument("-n_kernels_G","--n_kernels_G", dest='n_kernels_G', type=str, help="number of kernels in Generator", default = "128,64,32,1;128,64,32,1")
-    parser.add_argument("-cnn_n_row_G","--cnn_n_row_G", dest='cnn_n_row_G', type=str, help="number of rows in CNN for Generator", default = "4,4,4,4;4,4,4,4")
-    parser.add_argument("-cnn_n_col_G","--cnn_n_col_G", dest='cnn_n_col_G', type=str, help="number of cols in CNN for Generator", default = "4,4,4,4;4,4,4,4")
+    parser.add_argument("-n_kernels_G","--n_kernels_G", dest='n_kernels_G', type=str, help="# kernels in generator(s)", default = "128,64,32,1;128,64,32,1")
+    parser.add_argument("-cnn_n_row_G","--cnn_n_row_G", dest='cnn_n_row_G', type=str, help="# rows in CNN for generator(s)", default = "4,4,4,4;4,4,4,4")
+    parser.add_argument("-cnn_n_col_G","--cnn_n_col_G", dest='cnn_n_col_G', type=str, help="# cols in CNN for generator(s)", default = "4,4,4,4;4,4,4,4")
     
-    parser.add_argument("-n_kernels_D","--n_kernels_D", dest='n_kernels_D', type=str, help="number of kernels in Discriminator", default = "16,32,64,128;16,32,64,128")
-    parser.add_argument("-cnn_n_row_D","--cnn_n_row_D", dest='cnn_n_row_D', type=str, help="number of rows in CNN for Discriminator", default = "4,4,4,4;4,4,4,4")
-    parser.add_argument("-cnn_n_col_D","--cnn_n_col_D", dest='cnn_n_col_D', type=str, help="number of cols in CNN for Discriminator", default = "4,4,4,4;4,4,4,4")
-    parser.add_argument("-pool_n_row_D","--pool_n_row_D", dest='pool_n_row_D', type=str, help="number of rows in pooling layers for Discriminator", default = "2,2,2,2;2,2,2,2")
-    parser.add_argument("-pool_n_col_D","--pool_n_col_D", dest='pool_n_col_D', type=str, help="number of cols in pooling layers for Discriminator", default = "2,2,2,2;2,2,2,2")
+    parser.add_argument("-n_kernels_D","--n_kernels_D", dest='n_kernels_D', type=str, help="# kernels in discriminator(s)", default = "16,32,64,128;16,32,64,128")
+    parser.add_argument("-cnn_n_row_D","--cnn_n_row_D", dest='cnn_n_row_D', type=str, help="# rows in CNN for discriminator(s)", default = "4,4,4,4;4,4,4,4")
+    parser.add_argument("-cnn_n_col_D","--cnn_n_col_D", dest='cnn_n_col_D', type=str, help="# cols in CNN for discriminator(s)", default = "4,4,4,4;4,4,4,4")
+    parser.add_argument("-pool_n_row_D","--pool_n_row_D", dest='pool_n_row_D', type=str, help="# rows in pooling layers for discriminator(s)", default = "2,2,2,2;2,2,2,2")
+    parser.add_argument("-pool_n_col_D","--pool_n_col_D", dest='pool_n_col_D', type=str, help="# cols in pooling layers for discriminator(s)", default = "2,2,2,2;2,2,2,2")
     
     #load, save model
-    parser.add_argument("-mod", "--modality", dest= 'modality', type=str, help="modality", default='feat')
-    parser.add_argument("-sm", "--save_model", dest= 'save_model', type=str, help="save model", default='./model/model')
-    parser.add_argument("-lm_G", "--load_model_G", dest= 'load_model_G', type=str, help="load pre-trained mode")
-    parser.add_argument("-lm_D", "--load_model_D", dest= 'load_model_D', type=str, help="load pre-trained mode")
-    parser.add_argument("-frozen_G", "--frozen_G", dest= 'frozen_G', type=str, help="0,1,2,3,4")
-    parser.add_argument("-unloaded_G", "--unloaded_G", dest= 'unloaded_G', type=str, help="0,1,2,3,4")
-    parser.add_argument("-frozen_D", "--frozen_D", dest= 'frozen_D', type=str, help="0,1,2,3,4")
-    parser.add_argument("-unloaded_D", "--unloaded_D", dest= 'unloaded_D', type=str, help="0,1,2,3,4")
+    parser.add_argument("-mod", "--modality", dest= 'modality', type=str, help="input feature name in hd5 DB", default='feat')
+    parser.add_argument("-sm", "--save_model", dest= 'save_model', type=str, help="a path to save model", default='./model/model')
+    parser.add_argument("-lm_G", "--load_model_G", dest= 'load_model_G', type=str, help="load pre-trained generator(s)")
+    parser.add_argument("-lm_D", "--load_model_D", dest= 'load_model_D', type=str, help="load pre-trained discriminator(s)")
+    parser.add_argument("-frozen_G", "--frozen_G", dest= 'frozen_G', type=str, help="indice of layers to be frozen in generator(s), indice are separated by comma, e.g. 0,1,2,3, and the weights will not be updated")
+    parser.add_argument("-unloaded_G", "--unloaded_G", dest= 'unloaded_G', type=str, help="indice of layers to be ignored in generator(s), indice are separated by comma, e.g. 0,1,2,3, and the weights will not be loaded")
+    parser.add_argument("-frozen_D", "--frozen_D", dest= 'frozen_D', type=str, help="indice of layers to be frozen in discriminator(s), indice are separated by comma, e.g. 0,1,2,3, and the weights will not be updated")
+    parser.add_argument("-unloaded_D", "--unloaded_D", dest= 'unloaded_D', type=str, help="indice of layers to be ignored in discriminator(s), indice are separated by comma, e.g. 0,1,2,3, and the weights will not be loaded")
 
     #cv 
-    parser.add_argument("-dt", "--data", dest= 'data', type=str, help="data")
-    parser.add_argument("-n_cc", "--n_cc", dest= 'cc', type=str, help="cc (0,1,2,3,4)")
-    parser.add_argument("-test_idx", "--test_idx", dest= 'test_idx', type=str, help="(0,1,2,3,4)")
-    parser.add_argument("-train_idx", "--train_idx", dest= 'train_idx', type=str, help="(0,1,2,3,4)")
-    parser.add_argument("-valid_idx", "--valid_idx", dest= 'valid_idx', type=str, help="(0,1,2,3,4)")
+    parser.add_argument("-dt", "--data", dest= 'data', type=str, help="path of DB")
+    parser.add_argument("-test_idx", "--test_idx", dest= 'test_idx', type=str, help="indice of test sets, separated by commas")
+    parser.add_argument("-train_idx", "--train_idx", dest= 'train_idx', type=str, help="indice of train sets, separated by commas")
+    parser.add_argument("-valid_idx", "--valid_idx", dest= 'valid_idx', type=str, help="indice of validation sets, separated by commas")
 
-    parser.add_argument("-mt", "--multitasks", dest= 'multitasks', type=str, help="multi-tasks (name:classes:idx:(cost_function):(weight)", default = 'class:4:0::')
+    parser.add_argument("-mt", "--multitasks", dest= 'multitasks', type=str, help="(Deprecated) variables for multi-tasks, the format is name:classes:idx:[cost_function]:[weight]", default = 'class:4:0::')
 
-    parser.add_argument("-log", "--log_file", dest= 'log_file', type=str, help="log file", default='./output/log.txt')
-    parser.add_argument("-save_img", "--save_img_folder", dest= 'save_img_folder', type=str, help="a folder to save images")
-    parser.add_argument("--default_G_D", help="default setup for G and D",
+    parser.add_argument("-log", "--log_file", dest= 'log_file', type=str, help="log file path", default='./output/log.txt')
+    parser.add_argument("-save_img", "--save_img_folder", dest= 'save_img_folder', type=str, help="folder to save images")
+    parser.add_argument("--default_G_D", help="use default setup for generator(s) and discriminator(s)",
                         action="store_true")
-    parser.add_argument("--turn_off_G", help="train only D",
+    parser.add_argument("--turn_off_G", help="train only discriminator(s)",
                         action="store_true")
-    parser.add_argument("--unsupervised", help="train but no use labels",
+    parser.add_argument("--unsupervised", help="train but no use labels, DB should have a label column that may have no actual values",
                         action="store_true")
                     
     args = parser.parse_args()
@@ -956,18 +956,6 @@ if __name__ == '__main__':
     lab_idx = multiTasks[0][2]
     n_class = multiTasks[0][1]
     
-    #cross validation
-    n_cc = []
-    if args.cc:
-        if ',' in args.cc:
-            n_cc = args.cc.split(',')
-        elif ':' in args.cc:
-            indice = args.cc.split(':')
-            for idx in range(int(indice[0]), int(indice[1]), +1):
-                n_cc.append(idx)
-        else:
-            n_cc = args.cc.split(',')
-        print('total cv: ', len(n_cc))
     
     #parsing weights for validity and classification tasks for GAN
     task_weights = []
@@ -986,29 +974,13 @@ if __name__ == '__main__':
                 s_train_csv = np.array(data)
                 print('Shape of the array %s feat: %s'% (modality, str(s_train_csv.shape)))
                 train_csv.append(s_train_csv)
-        '''   
-        #single modality(audio)
-        if hf.get('feat'):
-            data = hf.get('feat')
-            a_train_csv = np.array(data)
-            print('Shape of the array audio feat: ', a_train_csv.shape)
-            v_train_csv = None
-        else:
-            #multimodality
-            data = hf.get('a_feat')
-            a_train_csv = np.array(data)
-            print('Shape of the array audio feat: ', a_train_csv.shape)
-            
-            data = hf.get('v_feat')
-            v_train_csv = np.array(data)
-            print('Shape of the array video feat: ', v_train_csv.shape)
-        '''
+
         #labels
         data = hf.get('label')
         train_lab = np.array(data)
                 
         print('Shape of the array lab: ', train_lab.shape)
-        if len(n_cc) or len(test_idx) > 0:
+        if len(test_idx) > 0:
             start_indice = np.array(hf.get('start_indice'))
             end_indice = np.array(hf.get('end_indice'))
             print('Shape of the indice for start: ', start_indice.shape)
