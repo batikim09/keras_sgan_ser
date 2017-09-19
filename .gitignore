@@ -2,4 +2,5 @@
 *.tsv
 *.hdf5
 *.json
+*.png
 

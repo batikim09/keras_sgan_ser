@@ -787,7 +787,7 @@ class SGAN():
                 #save image
                 if save_img:
                     for idx in range(len(X_train)):
-                        self.save_imgs(self.generators[idx], epoch, save_img, logger, 2, 2, self.modality[idx])
+                        self.save_imgs(epoch, save_img, logger, 2, 2)
                         
                     log("epoch:\t%d\t image is saved" % (epoch), logger)
                     
@@ -798,16 +798,33 @@ class SGAN():
         #save model
         self.save_model(save_model_path)
     
-    def save_imgs(self, generator, epoch, name = "./images", logger = None, r = 2, c = 2, postfix = "audio"):
+    def save_imgs(self, epoch, name = "./images", logger = None, r = 2, c = 2):
         
-        if generator is None:
+        if self.generators is None:
             return
         
         r, c = 2, 2
         noise = np.random.normal(0, 1, (r * c, 100))
-        gen_imgs = generator.predict(noise)
+        gen_imgs = [] 
         
-        '''
+        for i in range(len(self.generators)):
+            generator = self.generators[i]
+            imgs = generator.predict(noise)
+            gen_imgs.append(imgs)
+            
+            # Rescale images 0 - 1
+            gen_imgs = 0.5 * gen_imgs + 1
+
+            fig, axs = plt.subplots(r, c)
+            cnt = 0
+            for i in range(r):
+                for j in range(c):
+                    axs[i,j].imshow(gen_imgs[cnt, :,:,0])
+                    axs[i,j].axis('off')
+                    cnt += 1
+            fig.savefig("%s/gan_img_%s_%d.png" % (name, self.modality[i], epoch))
+            plt.close()
+        
         prob = self.discriminator.predict(gen_imgs)
         
         if logger:
@@ -817,20 +834,7 @@ class SGAN():
             #write down probablity of validation(real/fake) and classification in the log file
             for validity_class in prob:
                 log("prob:%s"%(str(validity_class)), logger)
-        '''    
-            
-        # Rescale images 0 - 1
-        gen_imgs = 0.5 * gen_imgs + 1
-
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                axs[i,j].imshow(gen_imgs[cnt, :,:,0])
-                axs[i,j].axis('off')
-                cnt += 1
-        fig.savefig("%s/gan_img_%s_%d.png" % (name, postfix, epoch))
-        plt.close()
+        
 
     def save_model(self, model_name):
         def save(model, model_name):
@@ -914,7 +918,7 @@ if __name__ == '__main__':
     parser.add_argument("-train_idx", "--train_idx", dest= 'train_idx', type=str, help="indice of train sets, separated by commas")
     parser.add_argument("-valid_idx", "--valid_idx", dest= 'valid_idx', type=str, help="indice of validation sets, separated by commas")
 
-    parser.add_argument("-mt", "--multitasks", dest= 'multitasks', type=str, help="(Deprecated) variables for multi-tasks, the format is name:classes:idx:[cost_function]:[weight]", default = 'class:4:0::')
+    parser.add_argument("-mt", "--multitasks", dest= 'multitasks', type=str, help="variables for a task to classify, the input format is 'name:#classes:idx:[cost_function]:[weight]'", default = 'class:4:0::')
 
     parser.add_argument("-log", "--log_file", dest= 'log_file', type=str, help="log file path", default='./output/log.txt')
     parser.add_argument("-save_img", "--save_img_folder", dest= 'save_img_folder', type=str, help="folder to save images")
