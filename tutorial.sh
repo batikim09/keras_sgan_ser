@@ -42,6 +42,9 @@ python sgan_mer.py -lm_G './model/gan.unsupervised.av.temp.a_feat.generator;./mo
 #(6) train other corpora in unsupervised mode
 python sgan_mer.py -sm './model/gan.unsupervised.LSPEC.100.2d.si.AEFILSR.audio.4cls' -save_img './images/gan.unsupervised.LSPEC.100.2d.si.AEFILSR.4cls' -mod feat --unsupervised -p 15 -d_lr 0.000005 -g_lr 0.00002 -check_batch_interval 10 -save_img_interval 1 -b 128 -e 50 -depth_D 3 -n_node 512 -n_kernels_D 4,8,12 -cnn_n_row_D 16,32,64 -cnn_n_col_D 16,64,128 -pool_n_row_D 1,2,4 -pool_n_col_D 1,2,4 -r_nrow 100 -r_ncol 128 -task_weights 0.5,0.5 -depth_G 4 -n_kernels_G 4,64,32,1 -cnn_n_row_G 3,3,3,3 -cnn_n_col_G 3,3,3,3 -test_idx 111:130 -valid_idx 111:130 -dt ../../features/ser/stl_vs_mtl/lstm/LSPEC.100.2d.si.AEFILSR.4cls.h5 -log ./logs/gan.AEFILSR.unsupervised.csv 
 
+#(7) load pretrained audio model and train IEMOCAP but freeze layers (not to be updated during training)
+python sgan_mer.py -lm_G './model/gan.unsupervised.LSPEC.100.2d.si.AEFILSR.audio.4cls.feat.generator' -lm_D './model/gan.unsupervised.LSPEC.100.2d.si.AEFILSR.audio.4cls.discriminator' -frozen_G 0:8 -frozen_D 0:12 -mod feat -p 5 -d_lr 0.000005 -g_lr 0.00002 -check_batch_interval 10 -save_img_interval 1 -b 128 -e 30 -n_node 256 -task_weights 0.5,0.5 -test_idx 0,1 -valid_idx 2,3 -dt ../../features/ser/stl_vs_mtl/lstm/LSPEC.IEMOCAP.100.2d.10cc.4cls.h5 -mt class:4:0:: -log ./logs/gan.REC.mgan.g_lr.csv -depth_D 3 -n_node 512 -n_kernels_D 4,8,12 -cnn_n_row_D 16,32,64 -cnn_n_col_D 16,64,128 -pool_n_row_D 1,2,4 -pool_n_col_D 1,2,4 -r_nrow 100 -r_ncol 128 -task_weights 0.5,0.5 -depth_G 4 -n_kernels_G 4,64,32,1 -cnn_n_row_G 3,3,3,3 -cnn_n_col_G 3,3,3,3
+
 #single modality options
 #-depth_D 3 -n_kernels_D 2,4,6 -cnn_n_row_D 16,32,64 -cnn_n_col_D 16,64,128 -pool_n_row_D 1,2,4 -pool_n_col_D 1,2,4 -r_nrow 100 -r_ncol 128 -depth_G 4 -n_kernels_G 4,64,32,1 -cnn_n_row_G 3,3,3,3 -cnn_n_col_G 3,3,3,3
 

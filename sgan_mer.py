@@ -456,7 +456,7 @@ class SGAN():
         
         for generator in self.generators:
             generator.compile(loss=[fake_real_loss], optimizer=g_optimizer)
-            print("Current configuration for a_generator")
+            print("Current configuration for generator")
             generator.summary()
             
         #load pretrain_model the generator
@@ -553,13 +553,13 @@ class SGAN():
         parsed_list = []
         if args_str:
             if ',' in args_str:
-                parsed_list = args_str.split(',')
+                parsed_list = str_to_int(args_str.split(','))
             elif ':' in args_str:
                 indice = args_str.split(':')
                 for idx in range(int(indice[0]), int(indice[1]) + 1, +1):
                     parsed_list.append(idx)
             else:
-                parsed_list = args_str.split(",")
+                parsed_list = str_to_int(args_str.split(","))
         
         return parsed_list
     
@@ -579,11 +579,16 @@ class SGAN():
         #total number of layers
         n_layers = len(model.layers)
         print("total layers: ", n_layers)
-
+        if len(frozen_layer_list) == 1 and frozen_layer_list[0] == -1:
+            frozen_layer_list = [int(x) for x in range(n_layers)]
+        
         for idx in frozen_layer_list:
             print("layer: ", model.layers[int(idx)].name, " is frozen")
             model.layers[int(idx)].trainable = False    
-
+        
+        if len(unload_layer_list) == 1 and unload_layer_list[0] == -1:
+            unload_layer_list = [int(x) for x in range(n_layers)]
+            
         for idx in unload_layer_list:
             if idx >= n_layers:
                 continue
