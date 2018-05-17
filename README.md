@@ -34,6 +34,8 @@ This data has log-spectrogram features extracted from the RECOLA corpus
 
 F. Ringeval, A. Sonderegger, J. Sauer and D. Lalanne, "Introducing the RECOLA Multimodal Corpus of Remote Collaborative and Affective Interactions", 2nd International Workshop on Emotion Representation, Analysis and Synthesis in Continuous Time and Space (EmoSPACE), in Proc. of IEEE Face & Gestures 2013, Shanghai (China), April 22-26 2013.)
 
+To prepare own database, please see https://github.com/batikim09/SER_FEAT_EXT.
+
 The database has three data: "a_feat", "v_feat", and "label", representing that audio, video(face), and emotional labels(arousal, valence, and etc.). Note that "a_feat" and "v_feat" are just key values, they can be any values as defined in the database.
 
 "a_feat" has the following structure in numpy matrix: 
